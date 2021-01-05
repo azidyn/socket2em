@@ -1,5 +1,5 @@
 
-const WebSocketClient = require('../ws/WebsocketClient');
+const WebSocketClient = require('../../ws/WebsocketClient');
 const OrderbookManager = require('./orderbook');
 
 const URI = 'wss://www.bitmex.com/realtime';

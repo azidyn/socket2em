@@ -2,7 +2,7 @@
 require('./util/debug');
 
 
-const BitMEX = require('./bitmex/connection');
+const BitMEX = require('./exchange/bitmex/connection');
 
 let bitmex = new BitMEX({ simulate: 100 });
 

@@ -1,6 +1,6 @@
 
 const bugger    = buggerit( true );
-const Book      = require('../lob');
+const Book      = require('../../lob');
 
 class Orderbook {
 
