@@ -8,8 +8,7 @@
 	
 */
 
-
-const WebSocket = require('ws');
+const WebSocket = require('isomorphic-ws');
 
 const RECONNECT_DURATION = 5;
 const HEARTBEAT_DURATION = 90;
@@ -51,16 +50,24 @@ WebSocketClient.prototype.open = function(url)
 {
 	this.url = url;
 	this.instance = new WebSocket(this.url);
-    
-    this.instance.on('open',()=>{
+
+    // this.instance.on('open',()=>{
+	// 	this.onopen();
+    // });
+	this.instance.onopen = () => {
+
 		this.onopen();
-    });
+
+	}
     
-	this.instance.on('message',(data,flags)=>{		
+    
+	// this.instance.on('message',(data,flags)=>{		
+	this.instance.onmessage = ( packet, flags ) => {
+
 		this.number ++;
 
         // Sent by the BitMEX server in response to our 'ping' message as we detected a possible stale connection
-        if ( data == 'pong' )        
+        if ( packet.data == 'pong' )        
         {
             console.log( 'pong heartbeat received - cancelling reconnect' );
             if ( reconnectTimer )
@@ -72,9 +79,12 @@ WebSocketClient.prototype.open = function(url)
         this.resetHeartbeat();
 
 
-		this.onmessage(data,flags,this.number);
-	});
-	this.instance.on('close',(e)=>{
+		this.onmessage(packet.data,flags,this.number);
+	
+	};
+
+	// this.instance.on('close',(e)=>{
+	this.instance.onclose = (e)=>{
 		switch (e.code){
 		case 1000:	// CLOSE_NORMAL
 			console.log("WebSocket: closed");
@@ -84,8 +94,10 @@ WebSocketClient.prototype.open = function(url)
 			break;
 		}
 		this.onclose(e);
-	});
-	this.instance.on('error',(e)=>{
+	};
+	
+	// this.instance.on('error',(e)=>{
+	this.instance.onerror = (e)=> {
 		switch (e.code){
 		case 'ECONNREFUSED':
 			this.reconnect(e);
@@ -94,11 +106,16 @@ WebSocketClient.prototype.open = function(url)
 			this.onerror(e);
 			break;
 		}
-	});
+	};
 }
 WebSocketClient.prototype.send = function(data,option){
 	try{
+		
+		// console.log('\n\nsending\n\n')
+		// console.log( this.instance.send );
+
 		this.instance.send(data,option);
+		
 	}catch (e){
 		this.instance.emit('error',e);
 	}
