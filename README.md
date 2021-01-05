@@ -1,8 +1,8 @@
 # socket2em
-Websocket (*Browser*, web) based crypto exchange data feeds consumption and normalization. Work in progress.
+Websocket (*Browser*, web) based crypto derivative exchange data feeds consumption and normalization. Work in progress.
 
 Connect and consume orderbooks, live trades and possibly other exchange metrics (liquidations, OI, funding etc) through a normalized interface
-also providing direct orderbook management built-in.
+also providing robust and fast orderbook management built-in.
 
 ### Project aims to support browsers natively for **serverless applications** with a focus on performance, minimal memory reqs etc.
 
