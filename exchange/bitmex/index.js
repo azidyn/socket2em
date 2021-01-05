@@ -136,7 +136,7 @@ class bitmex {
         json = JSON.parse( data );
 
         switch( json.table ) {
-            case "orderBookL2_25": 
+            case "orderBookL2": 
                 this.library.handle( json );
                 break;
 
