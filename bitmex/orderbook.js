@@ -13,18 +13,48 @@ class Orderbook {
 
     }
 
+    partial( delta ) {
+
+        bugger( delta )
+
+    }
+
+    insert( delta ) {
+
+    }
+
+    update( delta ) {
+
+        // bugger( delta )
+
+    }
+
+    delete( delta ) {
+        
+        // -+bugger( delta )
+
+    }
+
 }
 
 
 class OrderbookManager {
 
     constructor() { 
+        
+        // Multiple orderbooks here, e.g. library['ETHUSD'], library['XBTUSD']
         this.library = { };
+
     }
 
     handle( msg ) {
 
-        this[ msg.action ]( msg );
+        let action = msg.action;
+
+        if ( msg.action == 'partial' )
+            this.partial( msg );
+        else
+            this.delta( msg, action );
 
     }
 
@@ -32,42 +62,29 @@ class OrderbookManager {
 
         // Full book reset on partial
 
-        bugger(`created new book ${msg.filter.symbol}`);
+        const lob = new Orderbook();
+        this.library[ msg.filter.symbol ] = lob;
 
-        this.library[ msg.filter.symbol ] = new Orderbook();
+        this.delta( msg, 'partial' );
 
     }
 
-    update( msg ) {
+    delta( msg, action ) {
 
         if ( !msg.data ) return;
         
-        let d, checked = false;
+        let d, L = this.library;
 
         // Iterate each data update
         for ( d of msg.data ) {
 
-            if ( !checked ) {
-
-                if ( !this.library[ d.symbol ] ) // check once, fast abort if not initialized
-                    return;
-
-                checked = true;
-            }
+            if ( L[ d.symbol ] )
+                L[ d.symbol ][ action ]( d );
             
         }
 
     }
 
-    insert( msg ) {
-
-       
-    }
-
-    delete( msg ) {
-
-
-    }
 
 }
 
