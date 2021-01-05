@@ -34,6 +34,25 @@
 
       </div>
 
+    <div class="col">
+          <table>
+            <tr v-for="row in this.lob.ftx.btc.asks" :key = "row[0]" style='background-color:#fdd' >
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }} </td>
+            </tr>
+
+            <tr >
+              <td style="padding: 5px; font-weight:bold" colspan="2">FTX:ETH-PERP</td>
+            </tr>
+
+            <tr v-for="row in this.lob.ftx.btc.bids" :key = "row[0]" style='background-color:#dfd' >
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }} </td>
+            </tr>
+          </table>        
+
+      </div>         
+
 
       <div class="col">
           <table>
@@ -92,6 +111,8 @@
 
       </div>         
 
+        
+
       <div class="col">
         <table class="table">
           <tr>
@@ -102,7 +123,7 @@
             <th>Size</th>
           </tr>
           <tr v-for="row in this.trades" :key=" row.id " :style=" row.side == 'sell' ? 'background-color: #fdd' : 'background-color: #dfd' ">
-            <td>{{ row.side == 'sell' ? '🔽' : '🔼'}}</td>
+            <td>{{ row.side == 'sell' ? '🍅' : '🥒'}}</td>
             <td>{{ row.exchange }}</td>
             <td>{{ row.symbol }}</td>
             <td>{{ row.price }}</td>
@@ -146,6 +167,7 @@ require('../../util/debug');
 const BitMEX = require('../../exchange/bitmex');
 const ByBit = require('../../exchange/bybit/linear');
 const iByBit = require('../../exchange/bybit/inverse');
+const FTX = require('../../exchange/ftx');
 
 
 export default {
@@ -183,6 +205,7 @@ export default {
 
       bitmex: null,
       bybit: null,
+      ftx: null,
 
       lob: {
         bitmex: {
@@ -208,7 +231,14 @@ export default {
             bids: [],
             asks: []
           }
-        }
+        },
+
+        ftx: {
+          btc: { 
+            bids: [],
+            asks: []
+          }
+        }        
 
 
 
@@ -226,34 +256,53 @@ export default {
     this.bitmex = new BitMEX();
     this.bybit = new ByBit();
     this.ibybit = new iByBit();
+    this.ftx = new FTX();
 
     // subscribe orderbooks
     this.bitmex.orderbook('ETHUSD');
     this.bitmex.orderbook('XBTUSD');
     this.bybit.orderbook('BTCUSDT')
     this.ibybit.orderbook('BTCUSD')
+    this.ftx.orderbook('ETH-PERP');
 
     //subscribe trades
     this.bitmex.trades('XBTUSD');
     this.bybit.trades('BTCUSDT');
     this.ibybit.trades('BTCUSD');
+    this.ftx.trades('BTC-PERP');
 
     this.bitmex.connect();
     this.bybit.connect();
     this.ibybit.connect();
+    this.ftx.connect();
 
 
     this.bitmex.on('trades', this.dotrades );
     this.bybit.on('trades', this.dotrades );
     this.ibybit.on('trades', this.dotrades );
-      
+    this.ftx.on('trades', this.dotrades );
 
+    // this.bitmex.on('orderbook', state => {
+    //   if ( state.instrument != 'XBTUSD') return;
+
+    //   let xbt = this.bitmex.library.snapshot( 'XBTUSD', 10 );
+
+    //     if ( xbt ) {
+
+    //       this.lob.bitmex.xbt.bids = xbt.bid;
+    //       this.lob.bitmex.xbt.asks = xbt.ask.reverse();
+        
+    //     }
+
+    // })
+      
     setInterval( ()=> {
 
         let eth = this.bitmex.library.snapshot( 'ETHUSD', 10 );
         let xbt = this.bitmex.library.snapshot( 'XBTUSD', 10 );
         let bybit_btc = this.bybit.library.snapshot('BTCUSDT', 10 );
         let ibybit_btc = this.ibybit.library.snapshot('BTCUSD', 10 );
+        let ftx = this.ftx.library.snapshot('ETH-PERP', 10 );
 
         if ( eth ) {
 
@@ -282,9 +331,18 @@ export default {
           this.lob.ibybit.btc.bids = ibybit_btc.bid;
           this.lob.ibybit.btc.asks = ibybit_btc.ask.reverse();
 
+        }  
+        
+
+        if ( ftx ) {
+
+          this.lob.ftx.btc.bids = ftx.bid;
+          this.lob.ftx.btc.asks = ftx.ask.reverse();
+
         }        
 
-    }, 50 );
+
+    }, 200 );
 
   }
 }

@@ -22,6 +22,7 @@ bybit.orderbook( 'BTCUSDT' );
 ftx.orderbook( 'BTC-PERP' );
 
 
+
 bybit.connect();
 ibybit.connect();
 bitmex.connect();
@@ -68,7 +69,6 @@ setInterval( ()=> {
 
     let ft = ftx.library.snapshot('BTC-PERP', 3 );
     console.log( `\FTX BTC-PERP\n`, ft )
-
 
     console.log(' ');
 
