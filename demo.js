@@ -1,26 +1,27 @@
 
 require('./util/debug');
 
-const BitMEX = require('./exchange/bitmex');
+// const BitMEX = require('./exchange/bitmex');
 
-let bitmex = new BitMEX();
+// let bitmex = new BitMEX();
 
-bitmex.connect();
+// bitmex.connect();
 
-bitmex.subscribe('ETHUSD', 'orderBookL2');
-// bitmex.subscribe('XBTUSD', 'orderBookL2');
+// bitmex.subscribe('ETHUSD', 'orderBookL2');
 
 
-setInterval( ()=> {
+// setInterval( ()=> {
 
-    let s = bitmex.library.snapshot( 'ETHUSD', 3 );
+//     let s = bitmex.library.snapshot( 'ETHUSD', 3 );
 
-    console.log( `ETHUSD...`)
-    console.log( s );
+//     console.log( s );
 
-    // s = bitmex.library.snapshot( 'XBTUSD', 3 );
+// }, 500 );
 
-    // console.log( `XBTUSD...`)
-    // console.log( s );
+const ByBit = require('./exchange/bybit');
 
-}, 500 );
+let bybit = new ByBit({ simulate: 1000 });
+
+bybit.connect();
+bybit.subscribe('BTCUSD', 'orderBook_200.100ms');
+

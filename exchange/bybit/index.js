@@ -1,20 +1,21 @@
 
 const WebSocketClient = require('../../ws/WebsocketClient');
-const OrderbookManager = require('./orderbook/OrderbookManager');;
 
+const OrderbookManager = require('./orderbook/OrderbookManager');;
+const Simulate = require('../../util/simulate');
 
 // linear: wss://stream.bybit.com/realtime_public
 // inverse: wss://stream.bybit.com/realtime
 
-const URI = 'wss://www.bitmex.com/realtime';
+const URI = 'wss://stream.bybit.com/realtime';
 
 const fs = require('fs');
 
-const CAPTURE =  null;//'./ethusd-l2-stream.json';
+const CAPTURE = null;///'./btcusd-l2-replay.json';
 
 let messages = [];
 
-let json;
+let json, topic;
 
 // Record l2 stream for replay debugging
 if ( CAPTURE != null ) {
@@ -28,7 +29,7 @@ if ( CAPTURE != null ) {
 
 }
 
-class bitmex {
+class ByBit {
 
     constructor( opts={} ) {
 
@@ -40,9 +41,7 @@ class bitmex {
         if ( this.opts.simulate ) {
             
             console.log('Running simulation')
-
-            const Simulate = require('./simulate');
-            Simulate.run( this.opts.simulate, (this.delegate).bind(this) );
+            Simulate.run( `${__dirname}/btcusd-l2-replay.json`, this.opts.simulate, (this.delegate).bind(this) );
 
             return;
         }
@@ -73,7 +72,7 @@ class bitmex {
         }
 
         this.ws.onmessage = data => {
-            
+
             if ( CAPTURE != null )
                 messages.push( data );
 
@@ -128,22 +127,24 @@ class bitmex {
 
         return {
             op: "subscribe",
-            args: [ `${channel}:${instrument}` ]
+            args: [ `${channel}.${instrument}` ]
         };
     }
 
     delegate( data ) {
-
+       
         if ( CAPTURE != null )
             return;
 
         json = JSON.parse( data );
 
-        switch( json.table ) {
-            case "orderBookL2": 
-                this.library.handle( json );
-                break;
+        // "orderBook_200.100ms.BTCUSD"
+        topic = json.topic.split('.');
 
+        switch( topic[0] ) {
+            case "orderBook_200": 
+                this.library.handle( json, topic[2] );
+                break;
 
         }
 
@@ -151,4 +152,4 @@ class bitmex {
 
 }
 
-module.exports = bitmex;
+module.exports = ByBit;
