@@ -1,16 +1,15 @@
+const fs                = require('fs');
+const WebSocketClient   = require('../../ws/WebsocketClient');
+const OrderbookManager  = require('./orderbook/OrderbookManager');;
+const EventEmitter      = require('../../util/EventEmitter');
+const Trade             = require('./trade/Trade');
 
-const WebSocketClient = require('../../ws/WebsocketClient');
-const OrderbookManager = require('./orderbook/OrderbookManager');;
+const { traceDeprecation } = require('process');
 
-const URI = 'wss://www.bitmex.com/realtime';
+const URI       = 'wss://www.bitmex.com/realtime';
+const CAPTURE   =  null; //'./ethusd-l2-stream.json';
 
-const fs = require('fs');
-
-const CAPTURE =  null;//'./ethusd-l2-stream.json';
-
-let messages = [];
-
-let json;
+let json, messages = [];
 
 // Record l2 stream for replay debugging
 if ( CAPTURE != null ) {
@@ -24,14 +23,17 @@ if ( CAPTURE != null ) {
 
 }
 
-class bitmex {
+class bitmex extends EventEmitter {
 
     constructor( opts={} ) {
+
+        super();
 
         this.opts = opts;
         this.connected = false;
 
         this.library = new OrderbookManager();
+        this.trade = new Trade({ aggregate: false });
 
         if ( this.opts.simulate ) {
             
@@ -69,7 +71,7 @@ class bitmex {
         }
 
         this.ws.onmessage = data => {
-            
+
             if ( CAPTURE != null )
                 messages.push( data );
 
@@ -78,6 +80,10 @@ class bitmex {
         }
 
 
+    }
+
+    trades( instrument ) {
+        this.subscribe( instrument, 'trade' );
     }
 
     orderbook( instrument ) {
@@ -148,6 +154,14 @@ class bitmex {
         switch( json.table ) {
             case "orderBookL2": 
                 this.library.handle( json );
+                break;
+
+            case "trade":
+                
+                let trades = this.trade.handle( json.data );
+
+                this.fire( 'trades', trades )
+
                 break;
 
 
