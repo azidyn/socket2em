@@ -15,9 +15,9 @@
 
     <div class="row m-1">
 
-      <div class="col-3">
+      <div class="col">
           <table>
-            <tr v-for="row in this.eth.asks" :key = "row[0]" style='background-color:#fdd' >
+            <tr v-for="row in this.lob.bitmex.eth.asks" :key = "row[0]" style='background-color:#fdd' >
               <td>{{ row[0] }}</td>
               <td>{{ row[1] }} </td>
             </tr>
@@ -26,7 +26,7 @@
               <td style="padding: 5px; font-weight:bold" colspan="2">BitMEX:ETHUSD</td>
             </tr>
 
-            <tr v-for="row in this.eth.bids" :key = "row[0]" style='background-color:#dfd' >
+            <tr v-for="row in this.lob.bitmex.eth.bids" :key = "row[0]" style='background-color:#dfd' >
               <td>{{ row[0] }}</td>
               <td>{{ row[1] }} </td>
             </tr>
@@ -35,9 +35,9 @@
       </div>
 
 
-      <div class="col-3">
+      <div class="col">
           <table>
-            <tr v-for="row in this.xbt.asks" :key = "row[0]" style='background-color:#fdd' >
+            <tr v-for="row in this.lob.bitmex.xbt.asks" :key = "row[0]" style='background-color:#fdd' >
               <td>{{ row[0] }}</td>
               <td>{{ row[1] }} </td>
             </tr>
@@ -46,11 +46,69 @@
               <td style="padding: 5px; font-weight:bold" colspan="2">BitMEX:XBTUSD</td>
             </tr>
 
-            <tr v-for="row in this.xbt.bids" :key = "row[0]" style='background-color:#dfd' >
+            <tr v-for="row in this.lob.bitmex.xbt.bids" :key = "row[0]" style='background-color:#dfd' >
               <td>{{ row[0] }}</td>
               <td>{{ row[1] }} </td>
             </tr>
           </table>        
+
+      </div>
+
+    <div class="col">
+          <table>
+            <tr v-for="row in this.lob.bybit.btc.asks" :key = "row[0]" style='background-color:#fdd' >
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }} </td>
+            </tr>
+
+            <tr >
+              <td style="padding: 5px; font-weight:bold" colspan="2">ByBit-Linear:BTCUSDT</td>
+            </tr>
+
+            <tr v-for="row in this.lob.bybit.btc.bids" :key = "row[0]" style='background-color:#dfd' >
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }} </td>
+            </tr>
+          </table>        
+
+      </div>      
+
+    <div class="col">
+          <table>
+            <tr v-for="row in this.lob.ibybit.btc.asks" :key = "row[0]" style='background-color:#fdd' >
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }} </td>
+            </tr>
+
+            <tr >
+              <td style="padding: 5px; font-weight:bold" colspan="2">ByBit-Inverse:BTCUSD</td>
+            </tr>
+
+            <tr v-for="row in this.lob.ibybit.btc.bids" :key = "row[0]" style='background-color:#dfd' >
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }} </td>
+            </tr>
+          </table>        
+
+      </div>         
+
+      <div class="col">
+        <table class="table">
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Price</th>
+            <th>Size</th>
+          </tr>
+          <tr v-for="row in this.trades" :key=" row.id " :style=" row.side == 'sell' ? 'background-color: #fdd' : 'background-color: #dfd' ">
+            <td>{{ row.side == 'sell' ? '🔽' : '🔼'}}</td>
+            <td>{{ row.exchange }}</td>
+            <td>{{ row.symbol }}</td>
+            <td>{{ row.price }}</td>
+            <td>{{ row.size }}</td>
+          </tr>
+        </table>
 
       </div>
 
@@ -86,6 +144,8 @@
 require('../../util/debug');
 
 const BitMEX = require('../../exchange/bitmex');
+const ByBit = require('../../exchange/bybit/linear');
+const iByBit = require('../../exchange/bybit/inverse');
 
 
 export default {
@@ -94,20 +154,65 @@ export default {
     
   },
 
+  methods: {
+    dotrades: function( trades ) {
+      
+      for ( let t of trades ) {
+        if ( t.size >= this.minsizetrade ) {
+          t.id = this.id++;
+          this.trades2.push( t );
+        }
+      }
+
+      this.trades = (this.trades2.slice( -20 )).reverse();
+      this.trades2 = this.trades2.slice( -20 );
+
+    }
+  },
+
   data() {
     return {
 
+      minsizetrade: 5000,
+
+      id: 0,
+
+      trades: [],
+
+      trades2: [],
+
       bitmex: null,
+      bybit: null,
 
-      eth: { 
-        bids: [],
-        asks: []
-      },
+      lob: {
+        bitmex: {
+          eth: { 
+            bids: [],
+            asks: []
+          },
+          xbt: { 
+            bids: [],
+            asks: []
+          }      
+        },
 
-      xbt: { 
-        bids: [],
-        asks: []
-      }      
+        bybit: {
+          btc: { 
+            bids: [],
+            asks: []
+          }
+        },
+
+        ibybit: {
+          btc: { 
+            bids: [],
+            asks: []
+          }
+        }
+
+
+
+      }
 
       // xbt: { bid: [], ask: [] }
 
@@ -116,31 +221,68 @@ export default {
 
   mounted() {
 
+
+
     this.bitmex = new BitMEX();
+    this.bybit = new ByBit();
+    this.ibybit = new iByBit();
+
+    // subscribe orderbooks
+    this.bitmex.orderbook('ETHUSD');
+    this.bitmex.orderbook('XBTUSD');
+    this.bybit.orderbook('BTCUSDT')
+    this.ibybit.orderbook('BTCUSD')
+
+    //subscribe trades
+    this.bitmex.trades('XBTUSD');
+    this.bybit.trades('BTCUSDT');
+    this.ibybit.trades('BTCUSD');
 
     this.bitmex.connect();
+    this.bybit.connect();
+    this.ibybit.connect();
 
-    this.bitmex.subscribe('ETHUSD', 'orderBookL2');
-    this.bitmex.subscribe('XBTUSD', 'orderBookL2');
+
+    this.bitmex.on('trades', this.dotrades );
+    this.bybit.on('trades', this.dotrades );
+    this.ibybit.on('trades', this.dotrades );
+      
 
     setInterval( ()=> {
 
         let eth = this.bitmex.library.snapshot( 'ETHUSD', 10 );
         let xbt = this.bitmex.library.snapshot( 'XBTUSD', 10 );
+        let bybit_btc = this.bybit.library.snapshot('BTCUSDT', 10 );
+        let ibybit_btc = this.ibybit.library.snapshot('BTCUSD', 10 );
 
         if ( eth ) {
 
-          this.eth.bids = eth.bid;
-          this.eth.asks = eth.ask.reverse();
+          this.lob.bitmex.eth.bids = eth.bid;
+          this.lob.bitmex.eth.asks = eth.ask.reverse();
         
         }
 
         if ( xbt ) {
 
-          this.xbt.bids = xbt.bid;
-          this.xbt.asks = xbt.ask.reverse();
+          this.lob.bitmex.xbt.bids = xbt.bid;
+          this.lob.bitmex.xbt.asks = xbt.ask.reverse();
         
         }
+
+        if ( bybit_btc ) {
+
+          this.lob.bybit.btc.bids = bybit_btc.bid;
+          this.lob.bybit.btc.asks = bybit_btc.ask.reverse();
+
+        }
+
+
+        if ( ibybit_btc ) {
+
+          this.lob.ibybit.btc.bids = ibybit_btc.bid;
+          this.lob.ibybit.btc.asks = ibybit_btc.ask.reverse();
+
+        }        
 
     }, 50 );
 

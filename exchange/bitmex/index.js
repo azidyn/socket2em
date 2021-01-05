@@ -1,3 +1,5 @@
+
+const Simulate          = require('../../util/simulate');
 const fs                = require('fs');
 const WebSocketClient   = require('../../ws/WebsocketClient');
 const OrderbookManager  = require('./orderbook/OrderbookManager');;
@@ -39,7 +41,7 @@ class bitmex extends EventEmitter {
             
             console.log('Running simulation')
 
-            const Simulate = require('./simulate');
+            
             Simulate.run( this.opts.simulate, (this.delegate).bind(this) );
 
             return;
