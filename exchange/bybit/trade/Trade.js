@@ -9,6 +9,9 @@ class Trade {
     constructor( opts={} ) {
 
         this.aggregate = opts.aggregate;
+        this.exchange = opts.exchange || 'bybit';
+        this.sizetoquote = opts.sizetoquote || false;
+
     }
 
     handle( trades ) {
@@ -17,12 +20,13 @@ class Trade {
             return this.agg( trades );
 
         return trades.map( t => ({
-            timestamp: t.trade_time_ms,
-            exchange: 'ibybit',
+            timestamp: Number( t.trade_time_ms ),
+            exchange: this.exchange,
             symbol: t.symbol,
             side: MAPSIDE[ t.side ],
-            price: t.price,
-            size: t.size
+            price: Number( t.price ),
+            size: this.sizetoquote ? Mathr.round( Number( t.size ) * Number( t.price ) ) : Number( t.size ),
+            sizecoin: Number( t.size )
         }));
 
     }
@@ -41,22 +45,23 @@ class Trade {
                     agg.push({ 
                         aggregate: true,
                         timestamp: lt,
-                        exchange: 'ibybit',
+                        exchange: this.exchange,
                         symbol: lsym,
                         side: MAPSIDE[ lside ],
                         price: lprice, 
-                        size: lsum, 
+                        size: this.sizetoquote ? Math.round( lsum * lprice) : lsum,
+                        sizecoin: lsum      
                     });
                 }
 
-                lt = t.trade_time_ms;
-                lsum = t.size;
-                lprice = t.price;
+                lt = Number( t.trade_time_ms );
+                lsum = Number( t.size );
+                lprice = Number( t.price );
                 lside = t.side;
                 lsym = t.symbol;
 
             } else {
-                lsum += t.size;
+                lsum += Number( t.size );
             }
         }        
 
@@ -64,11 +69,12 @@ class Trade {
             agg.push({ 
                 aggregate: true,
                 timestamp: lt,
-                exchange: 'ibybit',
+                exchange: this.exchange,
                 symbol: lsym,
                 side: MAPSIDE[ lside ],
                 price: lprice, 
-                size: lsum, 
+                size: this.sizetoquote ?  Math.round( lsum * lprice) : lsum,
+                sizecoin: lsum      
             });
         }
 

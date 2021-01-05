@@ -35,7 +35,7 @@ class iByBit extends EventEmitter {
         this.connected = false;
 
         this.library = new OrderbookManager();
-        this.trade = new Trade({ aggregate: true })
+        this.trade = new Trade({ exchange:'ibybit', sizetoquote: false, aggregate: true });
 
         if ( this.opts.simulate ) {
             

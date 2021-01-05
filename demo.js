@@ -5,16 +5,19 @@ const BitMEX    = require('./exchange/bitmex');
 const iByBit    = require('./exchange/bybit/inverse');
 const ByBit     = require('./exchange/bybit/linear');
 
-// let bitmex = new BitMEX();
+let bitmex = new BitMEX();
 let ibybit = new iByBit();
-// let bybit = new ByBit();
+let bybit = new ByBit();
 
-// ibybit.trades('BTCUSD');
-
-ibybit.connect();
-// ibybit.orderbook( 'BTCUSD' );
+bitmex.trades( 'XBTUSD' );
+bybit.trades( 'BTCUSDT' );
 ibybit.trades( 'BTCUSD' );
 
+bybit.connect();
+ibybit.connect();
+bitmex.connect();
+
+// ibybit.orderbook( 'BTCUSD' );
 // ibybit.on('orderbook', state => {
 
 //     console.log( state.instrument );
@@ -22,11 +25,21 @@ ibybit.trades( 'BTCUSD' );
 
 // });
 
+bybit.on('trades', trades => {
+
+    console.log( trades )
+});
+
 ibybit.on('trades', trades => {
 
     console.log( trades )
 });
 
+bitmex.on('trades', trades => {
+
+    console.log( trades );
+
+})
 
 // bybit.orderbook( 'BTCUSDT' );
 // bitmex.orderbook( 'XBTUSD' );
