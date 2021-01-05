@@ -80,6 +80,16 @@ class bitmex {
 
     }
 
+    orderbook( instrument ) {
+
+        this.subscribe( instrument, 'orderBookL2' );
+
+    }
+
+    stop( instrument, topic ) {
+        
+    }
+
     subscribe( instrument, channel ) {
 
         if ( this.opts.simulate )

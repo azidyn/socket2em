@@ -45,7 +45,7 @@ class OrderbookManager {
         
         if ( action == 'init' ) {
 
-            L.insert( msg.order_book );
+            L.insert( msg.order_book || msg );
 
         } else {
 

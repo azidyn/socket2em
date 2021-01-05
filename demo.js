@@ -1,41 +1,32 @@
 
 require('./util/debug');
 
-// const BitMEX = require('./exchange/bitmex');
+const BitMEX    = require('./exchange/bitmex');
+const iByBit    = require('./exchange/bybit/inverse');
+const ByBit     = require('./exchange/bybit/linear');
 
-// let bitmex = new BitMEX();
-
-// bitmex.connect();
-
-// bitmex.subscribe('ETHUSD', 'orderBookL2');
-
-
-// setInterval( ()=> {
-
-//     let s = bitmex.library.snapshot( 'ETHUSD', 3 );
-
-//     console.log( s );
-
-// }, 500 );
-
-const iByBit = require('./exchange/bybit/inverse');
-const ByBit = require('./exchange/bybit/linear');
-
+let bitmex = new BitMEX();
+let ibybit = new iByBit();
 let bybit = new ByBit();
 
-// let ibybit = new iByBit();
-// ibybit.connect();
-// ibybit.subscribe('BTCUSD', 'orderBook_200.100ms');
+ibybit.orderbook( 'BTCUSD' );
+bybit.orderbook( 'BTCUSDT' );
+bitmex.orderbook( 'XBTUSD' );
 
+bitmex.connect();
+ibybit.connect();
 bybit.connect();
-bybit.orderbook('BTCUSDT');
 
 setInterval( ()=> {
 
-    // let i = ibybit.library.snapshot( 'BTCUSD', 3 );
-    // console.log( i );
+    let mex = bitmex.library.snapshot( 'XBTUSD', 3 );
+    console.log( `\n----- BitMEX XBTUSD -----\n`, mex )    
 
-    let l = bybit.library.snapshot( 'BTCUSDT', 3 );
-    console.log( l );
+    let ib = ibybit.library.snapshot('BTCUSD', 3 );
+    console.log( `\n----- Bybit Inverse BTCUSD -----\n`, ib )
 
-}, 100 );
+    let lb = bybit.library.snapshot('BTCUSDT', 3 );
+    console.log( `\n----- Bybit Linear BTCUSDT -----\n`, lb )
+
+
+}, 500 );

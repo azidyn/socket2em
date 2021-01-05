@@ -147,6 +147,7 @@ class iByBit {
 
         json = JSON.parse( data );
 
+
         if ( !json.topic )
             return;
         
