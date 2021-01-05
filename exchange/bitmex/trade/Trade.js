@@ -9,7 +9,6 @@ class Trade {
     constructor( opts={} ) {
 
         this.aggregate = opts.aggregate;
-
     }
 
     handle( trades ) {
@@ -29,6 +28,8 @@ class Trade {
     }
 
     agg( trades ){
+
+        // Use execution timestamp, side, symbol to aggregate trades
 
         let agg = [], lt = '';
         let lprice=0, lsum = 0, lside ='', lsym = '';

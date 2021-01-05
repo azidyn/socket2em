@@ -152,16 +152,15 @@ class bitmex extends EventEmitter {
         json = JSON.parse( data );
 
         switch( json.table ) {
+
             case "orderBookL2": 
-                this.library.handle( json );
+
+                this.fire('orderbook', this.library.handle( json ) )
                 break;
 
             case "trade":
-                
-                let trades = this.trade.handle( json.data );
 
-                this.fire( 'trades', trades )
-
+                this.fire( 'trades', this.trade.handle( json.data ) )
                 break;
 
 

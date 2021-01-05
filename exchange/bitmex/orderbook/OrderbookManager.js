@@ -29,11 +29,11 @@ class OrderbookManager {
             const lob = new Orderbook();
             this.library[ msg.filter.symbol ] = lob;
 
-            this.process( msg, 'insert' );
+            return this.process( msg, 'insert' );
 
         } else {
             
-            this.process( msg, action );
+            return this.process( msg, action );
 
         }
 
@@ -51,6 +51,8 @@ class OrderbookManager {
             return;
 
         this.library[ instrument ][ action ]( msg.data );
+
+        return { instrument, orderbook: this.library[ instrument ].lob };
     }
 
 
