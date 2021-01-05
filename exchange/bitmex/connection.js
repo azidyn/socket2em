@@ -1,6 +1,6 @@
 
 const WebSocketClient = require('../../ws/WebsocketClient');
-const OrderbookManager = require('./orderbook');
+const OrderbookManager = require('./orderbook/OrderbookManager');;
 
 const URI = 'wss://www.bitmex.com/realtime';
 
@@ -144,8 +144,6 @@ class bitmex {
         }
 
     }
-
-
 
 }
 

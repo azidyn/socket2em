@@ -4,18 +4,24 @@ require('./util/debug');
 
 const BitMEX = require('./exchange/bitmex/connection');
 
-let bitmex = new BitMEX({ simulate: 100 });
+let bitmex = new BitMEX({ simulate: 250 });
 
 bitmex.connect();
 
 bitmex.subscribe('ETHUSD', 'orderBookL2_25');
+// bitmex.subscribe('XBTUSD', 'orderBookL2');
 
 
 setInterval( ()=> {
 
     let s = bitmex.library.snapshot( 'ETHUSD', 3 );
 
-    console.log('snapshot...');
+    console.log( `ETHUSD...`)
     console.log( s );
 
-}, 250 );
+    // s = bitmex.library.snapshot( 'XBTUSD', 3 );
+
+    // console.log( `XBTUSD...`)
+    // console.log( s );
+
+}, 500 );
