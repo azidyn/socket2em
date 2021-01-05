@@ -20,8 +20,15 @@ require('./util/debug');
 
 const ByBit = require('./exchange/bybit');
 
-let bybit = new ByBit({ simulate: 1000 });
+let bybit = new ByBit();
 
 bybit.connect();
-bybit.subscribe('BTCUSD', 'orderBook_200.100ms');
+bybit.subscribe('BTCUSDT', 'orderBook_200.100ms');
 
+setInterval( ()=> {
+
+    let s = bybit.library.snapshot( 'BTCUSD', 3 );
+
+    console.log( s );
+
+}, 100 );

@@ -138,8 +138,17 @@ class ByBit {
 
         json = JSON.parse( data );
 
+        if ( !json.topic )
+            return;
+        
         // "orderBook_200.100ms.BTCUSD"
-        topic = json.topic.split('.');
+        try {
+            topic = json.topic.split('.');
+        } catch( e ) {
+            console.log( json );
+            console.log(e )
+            process.exit();
+        }
 
         switch( topic[0] ) {
             case "orderBook_200": 
