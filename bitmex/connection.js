@@ -12,6 +12,7 @@ let messages = [];
 
 let json;
 
+// Record l2 stream for replay debugging
 if ( CAPTURE != null ) {
 
     setTimeout( ()=> {
@@ -25,7 +26,7 @@ if ( CAPTURE != null ) {
 
 class bitmex {
 
-    constructor( opts ) {
+    constructor( opts={} ) {
 
         this.opts = opts;
         this.connected = false;
@@ -34,8 +35,10 @@ class bitmex {
 
         if ( this.opts.simulate ) {
             
+            console.log('Running simulation')
+
             const Simulate = require('./simulate');
-            Simulate.run( 100, (this.delegate).bind(this) );
+            Simulate.run( this.opts.simulate, (this.delegate).bind(this) );
 
             return;
         }

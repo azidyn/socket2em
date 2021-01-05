@@ -1,6 +1,6 @@
 
-const bugger = buggerit( true );
-
+const bugger    = buggerit( true );
+const Book      = require('../lob');
 
 class Orderbook {
 
@@ -10,33 +10,77 @@ class Orderbook {
         // enforce a client-side structure down the wire.
 
         this.id = new Map();
+        this.lob = new Book();
 
     }
+    
+    insert( deltas ) {
 
-    partial( delta ) {
+        let delta;
 
-        bugger( delta )
-
-    }
-
-    insert( delta ) {
-
-    }
-
-    update( delta ) {
-
-        // bugger( delta )
-
-    }
-
-    delete( delta ) {
+        for ( delta of deltas ) {
         
-        // -+bugger( delta )
+            // Make a note of which id => price, need this for updates/deletes
+            this.id.set( delta.id, delta.price );
+
+            // Apply the delta
+            if ( delta.side == 'Buy' ) 
+                this.lob.bid( delta.price, delta.size );
+            else 
+                this.lob.ask( delta.price, delta.size );
+
+        }
+        
+    }
+
+    update( deltas ) {
+
+        let delta, price;
+
+        for ( delta of deltas ) {
+
+            price = this.id.get( delta.id );
+
+            if ( !price ) 
+                continue;
+                
+            if ( delta.side == 'Buy' ) 
+                this.lob.bid( price, delta.size )
+            else
+                this.lob.ask( price, delta.size )
+        }       
+
+    }
+
+    delete( deltas ) {
+
+        let delta, price;
+
+        for ( delta of deltas ) {
+
+            price = this.id.get( delta.id );
+            
+            if ( !price ) 
+                continue;
+
+            if ( delta.side == 'Buy' ) 
+                this.lob.bid( price, 0 )
+            else
+                this.lob.ask( price, 0 )
+
+        }             
+
 
     }
 
 }
 
+
+/*
+
+    Handles all traffic labelled 'orderbookL2' and delegates to specific symbol
+
+*/
 
 class OrderbookManager {
 
@@ -47,42 +91,47 @@ class OrderbookManager {
 
     }
 
+    snapshot( instrument, depth ) {
+
+        if ( !this.library[ instrument ] )
+            return undefined;
+
+        return this.library[ instrument ].lob.snapshot( depth );
+    }
+
     handle( msg ) {
 
         let action = msg.action;
 
-        if ( msg.action == 'partial' )
-            this.partial( msg );
-        else
-            this.delta( msg, action );
-
-    }
-
-    partial( msg ) {
-
-        // Full book reset on partial
-
-        const lob = new Orderbook();
-        this.library[ msg.filter.symbol ] = lob;
-
-        this.delta( msg, 'partial' );
-
-    }
-
-    delta( msg, action ) {
-
-        if ( !msg.data ) return;
-        
-        let d, L = this.library;
-
-        // Iterate each data update
-        for ( d of msg.data ) {
-
-            if ( L[ d.symbol ] )
-                L[ d.symbol ][ action ]( d );
+        if ( msg.action == 'partial' ) {
             
+            // Full book reset on partial
+
+            const lob = new Orderbook();
+            this.library[ msg.filter.symbol ] = lob;
+
+            this.process( msg, 'insert' );
+
+        } else {
+            
+            this.process( msg, action );
+
         }
 
+    }
+
+
+    process( msg, action ) {
+
+        if ( !msg.data || !msg.data.length ) 
+            return;
+
+        const instrument = msg.data[ 0 ].symbol;
+
+        if ( !this.library[ instrument ] ) 
+            return;
+
+        this.library[ instrument ][ action ]( msg.data );
     }
 
 
