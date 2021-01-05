@@ -11,6 +11,7 @@
 */
 
 
+
 const Orderbook = require('./Orderbook');
 
 class OrderbookManager {
@@ -32,39 +33,43 @@ class OrderbookManager {
 
     handle( msg ) {
 
-        let action = msg.action;
+        let action = msg.type;
 
         if ( action == 'partial' ) {
             
             // Full book reset on partial
 
             const lob = new Orderbook();
-            this.library[ msg.filter.symbol ] = lob;
+            this.library[ msg.market ] = lob;
 
-            return this.process( msg, 'insert' );
+            // console.log( msg )
+            return this.process( msg );
 
         } else {
             
-            return this.process( msg, action );
+            return this.process( msg );
+
+            
 
         }
 
     }
 
 
-    process( msg, action ) {
+    process( msg ) {
 
-        if ( !msg.data || !msg.data.length ) 
+        if ( !msg.data ) 
             return;
 
-        const instrument = msg.data[ 0 ].symbol;
+        const instrument = msg.market;
+        const L = this.library[ instrument ];
 
-        if ( !this.library[ instrument ] ) 
+        if ( !L) 
             return;
+       
+        L.update( msg.data );
 
-        this.library[ instrument ][ action ]( msg.data );
-
-        return { instrument, orderbook: this.library[ instrument ].lob };
+        return { instrument, orderbook: L.lob };
     }
 
 
