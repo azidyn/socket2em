@@ -1,21 +1,17 @@
 
-const WebSocketClient = require('../../ws/WebsocketClient');
+const fs                = require('fs');
+const WebSocketClient   = require('../../ws/WebsocketClient');
+const OrderbookManager  = require('./orderbook/OrderbookManager');;
+const Simulate          = require('../../util/simulate');
+const EventEmitter      = require('../../util/EventEmitter');
+const Trade             = require('./trade/Trade');
 
-const OrderbookManager = require('./orderbook/OrderbookManager');;
-const Simulate = require('../../util/simulate');
-
-// linear: wss://stream.bybit.com/realtime_public
-// inverse: wss://stream.bybit.com/realtime
 
 const URI = 'wss://stream.bybit.com/realtime';
-
-const fs = require('fs');
-
 const CAPTURE = null;///'./btcusd-l2-replay.json';
 
-let messages = [];
+let json, topic, messages = [];
 
-let json, topic;
 
 // Record l2 stream for replay debugging
 if ( CAPTURE != null ) {
@@ -29,14 +25,17 @@ if ( CAPTURE != null ) {
 
 }
 
-class iByBit {
+class iByBit extends EventEmitter {
 
     constructor( opts={} ) {
+
+        super();
 
         this.opts = opts;
         this.connected = false;
 
         this.library = new OrderbookManager();
+        this.trade = new Trade({ aggregate: true })
 
         if ( this.opts.simulate ) {
             
@@ -82,6 +81,12 @@ class iByBit {
 
 
     }
+
+    trades( instrument ) {
+
+        this.subscribe( instrument, 'trade' );
+    }
+
 
     orderbook( instrument ) {
 
@@ -161,7 +166,11 @@ class iByBit {
 
         switch( topic[0] ) {
             case "orderBook_200": 
-                this.library.handle( json, topic[2] );
+                this.fire('orderbook', this.library.handle( json, topic[2] ) );
+                break;
+                
+            default:
+                this.fire('trades', this.trade.handle( json.data ));
                 break;
 
         }

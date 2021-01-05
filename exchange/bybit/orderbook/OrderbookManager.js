@@ -25,11 +25,11 @@ class OrderbookManager {
             const lob = new Orderbook();
             this.library[ instrument ] = lob;
 
-            this.process( instrument, msg.data, 'init' );
+            return this.process( instrument, msg.data, 'init' );
 
         } else {
             
-            this.process( instrument, msg.data, 'delta' );
+            return this.process( instrument, msg.data, 'delta' );
 
         }
 
@@ -54,6 +54,8 @@ class OrderbookManager {
             if ( msg.insert.length ) L.insert( msg.insert );
 
         }
+
+        return { instrument, orderbook: L.lob };
     }
 
 

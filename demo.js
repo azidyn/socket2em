@@ -9,9 +9,25 @@ const ByBit     = require('./exchange/bybit/linear');
 let ibybit = new iByBit();
 // let bybit = new ByBit();
 
-ibybit.trades('BTCUSD');
+// ibybit.trades('BTCUSD');
 
+ibybit.connect();
 // ibybit.orderbook( 'BTCUSD' );
+ibybit.trades( 'BTCUSD' );
+
+// ibybit.on('orderbook', state => {
+
+//     console.log( state.instrument );
+//     console.log( state.orderbook.snapshot( 1 ));
+
+// });
+
+ibybit.on('trades', trades => {
+
+    console.log( trades )
+});
+
+
 // bybit.orderbook( 'BTCUSDT' );
 // bitmex.orderbook( 'XBTUSD' );
 // bitmex.trades('XBTUSD');
