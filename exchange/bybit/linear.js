@@ -155,17 +155,14 @@ class ByBit extends EventEmitter {
             return;
        
         // "orderBook_200.100ms.BTCUSD"
-        try {
-            topic = json.topic.split('.');
-        } catch( e ) {
-            console.log(e )
-            process.exit();
-        }
+        topic = json.topic.split('.');
 
         switch( topic[0] ) {
 
             case "orderBook_200": 
-                this.fire('orderbook', this.library.handle( json, topic[2] ) );
+                let res = this.library.handle( json, topic[2] );
+                if ( res )
+                    this.fire('orderbook', res );
                 break;
 
             case "trade": 

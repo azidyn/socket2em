@@ -49,8 +49,6 @@ class OrderbookManager {
             
             return this.process( msg );
 
-            
-
         }
 
     }

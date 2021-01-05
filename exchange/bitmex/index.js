@@ -167,7 +167,8 @@ class bitmex extends EventEmitter {
 
             case "orderBookL2": 
 
-                this.fire('orderbook', this.library.handle( json ) )
+                let res = this.library.handle( json );
+                if ( res ) this.fire('orderbook', res );
                 break;
 
             case "trade":

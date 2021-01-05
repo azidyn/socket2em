@@ -4,23 +4,28 @@ require('./util/debug');
 const BitMEX    = require('./exchange/bitmex');
 const iByBit    = require('./exchange/bybit/inverse');
 const ByBit     = require('./exchange/bybit/linear');
+const FTX       = require('./exchange/ftx');
 
-let bitmex = new BitMEX();
-let ibybit = new iByBit();
-let bybit = new ByBit();
+let bitmex  = new BitMEX();
+let ibybit  = new iByBit();
+let bybit   = new ByBit();
+let ftx     = new FTX();
 
 bitmex.trades( 'XBTUSD' );
 bybit.trades( 'BTCUSDT' );
 ibybit.trades( 'BTCUSD' );
+ftx.trades( 'BTC-PERP' );
 
 ibybit.orderbook( 'BTCUSD' );
 bitmex.orderbook( 'XBTUSD' );
 bybit.orderbook( 'BTCUSDT' );
+ftx.orderbook( 'BTC-PERP' );
 
 
 bybit.connect();
 ibybit.connect();
 bitmex.connect();
+ftx.connect();
 
 
 function show_trades( trades )  {
@@ -32,6 +37,7 @@ function show_trades( trades )  {
 bitmex.on('trades', show_trades )
 bybit.on('trades', show_trades )
 ibybit.on('trades', show_trades )
+ftx.on('trades', show_trades )
 
 /* 
 
@@ -59,6 +65,10 @@ setInterval( ()=> {
 
     let lb = bybit.library.snapshot('BTCUSDT', 3 );
     console.log( `\nBybit Linear BTCUSDT\n`, lb )
+
+    let ft = ftx.library.snapshot('BTC-PERP', 3 );
+    console.log( `\FTX BTC-PERP\n`, ft )
+
 
     console.log(' ');
 

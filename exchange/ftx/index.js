@@ -34,7 +34,7 @@ class ftx extends EventEmitter {
         this.connected = false;
 
         this.library = new OrderbookManager();
-        this.trade = new Trade({ aggregate: false });
+        this.trade = new Trade({ sizetoquote: true, aggregate: true });
 
         if ( this.opts.simulate ) {
             
@@ -82,12 +82,14 @@ class ftx extends EventEmitter {
     }
 
     trades( instrument ) {
-        // this.subscribe( instrument, 'trade' );
+        
+        this.subscribe( instrument, 'trades' );
+
     }
 
     orderbook( instrument ) {
 
-        // this.subscribe( instrument, 'orderBookL2' );
+        this.subscribe( instrument, 'orderbook' );
 
     }
 
@@ -154,14 +156,15 @@ class ftx extends EventEmitter {
         switch( json.channel ) {
 
             case "orderbook": 
-
-                this.library.handle( json )
-                // this.fire('orderbook',  )
+                let res = this.library.handle( json );
+                if ( res) this.fire('orderbook', res );
                 break;
 
-            case "trade":
+            case "trades":
+                
+                if ( !json.data ) return;
 
-                this.fire( 'trades', this.trade.handle( json.data ) )
+                this.fire( 'trades', this.trade.handle( json.market, json.data ) )
                 break;
 
 
