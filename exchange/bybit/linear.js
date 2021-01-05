@@ -84,6 +84,16 @@ class ByBit {
 
     }
 
+    orderbook( instrument ) {
+
+        this.subscribe( instrument, 'orderBook_200.100ms' );
+    }
+
+    stop( instrument, topic ) {
+        // unsubscribe from stream
+    }
+
+
     subscribe( instrument, channel ) {
 
         if ( this.opts.simulate )

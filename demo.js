@@ -21,20 +21,20 @@ require('./util/debug');
 const iByBit = require('./exchange/bybit/inverse');
 const ByBit = require('./exchange/bybit/linear');
 
-// let ibybit = new iByBit();
 let bybit = new ByBit();
 
+// let ibybit = new iByBit();
 // ibybit.connect();
 // ibybit.subscribe('BTCUSD', 'orderBook_200.100ms');
 
 bybit.connect();
-bybit.subscribe('BTCUSDT', 'orderBook_200.100ms');
+bybit.orderbook('BTCUSDT');
 
 setInterval( ()=> {
 
     // let i = ibybit.library.snapshot( 'BTCUSD', 3 );
     // console.log( i );
-    
+
     let l = bybit.library.snapshot( 'BTCUSDT', 3 );
     console.log( l );
 
