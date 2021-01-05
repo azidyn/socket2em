@@ -1,4 +1,16 @@
 
+/*
+
+    index.js [ BitMEX ]
+
+    Set up and manage the connection. Handle requests to subscribe to API topics.
+    Routes Websocket messages to either OrderbookManager, TradeManager or whatever.
+
+    TODO: test auto-reconnecting.
+   
+*/
+
+
 const Simulate          = require('../../util/simulate');
 const fs                = require('fs');
 const WebSocketClient   = require('../../ws/WebsocketClient');

@@ -1,4 +1,17 @@
 
+/*
+
+    OrderbookManager.js
+
+    Accepts Websocket messages marked 'orderbookL2' for all instruments.
+    Maintains a list of Orderbook objects and routes orderboook delta messages
+    to the correct book/instrument.
+
+    
+*/
+
+
+
 const Orderbook = require('./Orderbook');
 
 class OrderbookManager {
