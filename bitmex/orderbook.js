@@ -1,4 +1,7 @@
 
+const bugger = buggerit( true );
+
+
 class Orderbook {
 
     constructor() {
@@ -28,6 +31,8 @@ class OrderbookManager {
     partial( msg ) {
 
         // Full book reset on partial
+
+        bugger(`created new book ${msg.filter.symbol}`);
 
         this.library[ msg.filter.symbol ] = new Orderbook();
 

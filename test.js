@@ -1,4 +1,6 @@
 
+require('./util/debug');
+
 
 const BitMEX = require('./bitmex/connection');
 
