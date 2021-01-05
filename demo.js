@@ -18,17 +18,24 @@ require('./util/debug');
 
 // }, 500 );
 
-const ByBit = require('./exchange/bybit/inverse');
+const iByBit = require('./exchange/bybit/inverse');
+const ByBit = require('./exchange/bybit/linear');
 
+// let ibybit = new iByBit();
 let bybit = new ByBit();
+
+// ibybit.connect();
+// ibybit.subscribe('BTCUSD', 'orderBook_200.100ms');
 
 bybit.connect();
 bybit.subscribe('BTCUSDT', 'orderBook_200.100ms');
 
 setInterval( ()=> {
 
-    let s = bybit.library.snapshot( 'BTCUSD', 3 );
-
-    console.log( s );
+    // let i = ibybit.library.snapshot( 'BTCUSD', 3 );
+    // console.log( i );
+    
+    let l = bybit.library.snapshot( 'BTCUSDT', 3 );
+    console.log( l );
 
 }, 100 );

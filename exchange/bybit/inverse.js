@@ -29,7 +29,7 @@ if ( CAPTURE != null ) {
 
 }
 
-class ByBit {
+class iByBit {
 
     constructor( opts={} ) {
 
@@ -160,4 +160,4 @@ class ByBit {
 
 }
 
-module.exports = ByBit;
+module.exports = iByBit;
