@@ -4,9 +4,13 @@ const Asks = require('./asks');
 
 class Book {
 
-    constructor() {
-        this.bids = new Bids();
-        this.asks = new Asks();
+    constructor( opts={} ) {
+
+        // this.useref = opts.useref || false;
+        this.useref = true;
+
+        this.bids = new Bids( this.useref );
+        this.asks = new Asks( this.useref );
     }
 
     bid( price, size ) {

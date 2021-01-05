@@ -13,68 +13,53 @@ bitmex.trades( 'XBTUSD' );
 bybit.trades( 'BTCUSDT' );
 ibybit.trades( 'BTCUSD' );
 
+ibybit.orderbook( 'BTCUSD' );
+bitmex.orderbook( 'XBTUSD' );
+bybit.orderbook( 'BTCUSDT' );
+
+
 bybit.connect();
 ibybit.connect();
 bitmex.connect();
 
-// ibybit.orderbook( 'BTCUSD' );
+
+function show_trades( trades )  {
+    
+    for ( let t of trades ) 
+        console.log(`${t.exchange} ${t.side} ${t.symbol} ${t.size} @ ${t.price}`);
+}
+
+bitmex.on('trades', show_trades )
+bybit.on('trades', show_trades )
+ibybit.on('trades', show_trades )
+
+/* 
+
+Can also use event to snapshot order book like this: 
+
+*/
 // ibybit.on('orderbook', state => {
-
 //     console.log( state.instrument );
-//     console.log( state.orderbook.snapshot( 1 ));
-
+//     console.log( state.orderbook.snapshot( 3 ).ask );
+//     console.log( state.orderbook.snapshot( 3 ).bid );
 // });
 
-bybit.on('trades', trades => {
 
-    console.log( trades )
-});
+setInterval( ()=> {
 
-ibybit.on('trades', trades => {
+    // Snapshot all three orderbooks from BitMEX and Bybit and display
 
-    console.log( trades )
-});
+    console.log(`\n---- Orderbook Snapshots ----\n`)
 
-bitmex.on('trades', trades => {
+    let mex = bitmex.library.snapshot( 'XBTUSD', 3 );
+    console.log( `\nBitMEX XBTUSD`, mex )    
 
-    console.log( trades );
+    let ib = ibybit.library.snapshot('BTCUSD', 3 );
+    console.log( `\nBybit Inverse BTCUSD`, ib )
 
-})
+    let lb = bybit.library.snapshot('BTCUSDT', 3 );
+    console.log( `\nBybit Linear BTCUSDT\n`, lb )
 
-// bybit.orderbook( 'BTCUSDT' );
-// bitmex.orderbook( 'XBTUSD' );
-// bitmex.trades('XBTUSD');
-// bitmex.trades('ETHUSD');
+    console.log(' ');
 
-// bitmex.connect();
-// ibybit.connect();
-// bybit.connect();
-
-// bitmex.on('trades', trades => {
-//     console.log( trades );
-
-// })
-
-// bitmex.on('orderbook', state => {
-    
-//     console.log( state.instrument );
-//     console.log( state.orderbook.snapshot(1) );
-
-// })
-
-
-// setInterval( ()=> {
-
-//     // Snapshot all three orderbooks from BitMEX and Bybit and display
-
-//     // let mex = bitmex.library.snapshot( 'XBTUSD', 3 );
-//     // console.log( `\n----- BitMEX XBTUSD -----\n`, mex )    
-
-//     // let ib = ibybit.library.snapshot('BTCUSD', 3 );
-//     // console.log( `\n----- Bybit Inverse BTCUSD -----\n`, ib )
-
-//     // let lb = bybit.library.snapshot('BTCUSDT', 3 );
-//     // console.log( `\n----- Bybit Linear BTCUSDT -----\n`, lb )
-
-
-// }, 500 );
+}, 3000 );

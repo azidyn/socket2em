@@ -1,7 +1,8 @@
 
+
 class Bids {
     
-    constructor() {
+    constructor( useref=false ) {
         
         /*
             ordered list of prices which point to an index
@@ -13,6 +14,8 @@ class Bids {
         */
        this.ticks = [];
 
+       this.useref = useref;
+       this.r_snapshot = [];
 
        // Array index pointing to the best quote, must keep track of this
        this.head = 0;
@@ -121,18 +124,56 @@ class Bids {
     // Snapshot of the order book (prices with volume) for a given number of levels
     snapshot( levels ) {
 
-        let book = [];
-        
-        if (!this.ticks.length ) return book;
+        /* 
+            Instead of creating a new array object on snapshot
+            just overwrite an existing one and return the reference
+        */
+    
+        if ( this.useref ) {
 
-        for ( let t=this.head; t>=0; t--) {
+            if (!this.ticks.length ) return [];
 
-            if ( this.ticks[t][1] > 0 ) book.push([ this.ticks[t][0], this.ticks[t][1] ]);
-            if ( book.length == levels ) break;
+            // Requested a smaller snapshot that last time, delete book start again
+            if ( levels < this.r_snapshot.length )
+                this.r_snapshot = [];
 
+            let i = 0;
+            const S = this.r_snapshot;
+
+            for ( let t=this.head; t>=0; t--) {
+
+                if ( this.ticks[t][1] > 0 ) {
+                    if ( !S[i] ) S[i] = [0,0];
+                    S[ i ][ 0 ] = this.ticks[t][0];
+                    S[ i ][ 1 ] = this.ticks[t][1];
+                    i++;
+                }
+
+                if ( i == levels ) break;
+
+            }            
+
+            return this.r_snapshot;
+
+        } else {
+
+            /*
+                Create a new array object for the snapshot and return
+            */
+
+            let book = [];
+            
+            if (!this.ticks.length ) return book;
+
+            for ( let t=this.head; t>=0; t--) {
+
+                if ( this.ticks[t][1] > 0 ) book.push([ this.ticks[t][0], this.ticks[t][1] ]);
+                if ( book.length == levels ) break;
+
+            }
+
+            return book;
         }
-
-        return book;
 
     }
 

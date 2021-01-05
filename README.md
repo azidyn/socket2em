@@ -18,46 +18,110 @@ See `demo.js` for working example.
 
 /*  Initialize and subscribe  */
 
-const BitMEX = require('./exchange/bitmex');
+const BitMEX    = require('./exchange/bitmex');
+const iByBit    = require('./exchange/bybit/inverse');
+const ByBit     = require('./exchange/bybit/linear');
 
 let bitmex = new BitMEX();
+let ibybit = new iByBit();
+let bybit = new ByBit();
 
+bitmex.trades( 'XBTUSD' );
+bybit.trades( 'BTCUSDT' );
+ibybit.trades( 'BTCUSD' );
+
+ibybit.orderbook( 'BTCUSD' );
+bitmex.orderbook( 'XBTUSD' );
+bybit.orderbook( 'BTCUSDT' );
+
+
+bybit.connect();
+ibybit.connect();
 bitmex.connect();
-
-bitmex.subscribe('ETHUSD', 'orderBookL2');
-bitmex.subscribe('XBTUSD', 'orderBookL2');
 
 ```
 
-Then after some time....
+Update events; subscribe to 'trades' and/or 'orderbook' like this:
 
 ```js
 
-/* Snapshot the ETH and XBT orderbooks at 3 levels deep */
+bitmex.on('trades', show_trades )
+bybit.on('trades', show_trades )
+ibybit.on('trades', show_trades )
 
-let eth_orderbook = bitmex.library.snapshot( 'ETHUSD', 3 );
 
-console.log( `ETHUSD...`)
-console.log( eth_orderbook );
+function show_trades( trades )  {
+    
+    for ( let t of trades ) 
+        console.log(`${t.exchange} ${t.side} ${t.symbol} ${t.size} @ ${t.price}`);
+}
 
-let xbt_orderbook = bitmex.library.snapshot( 'XBTUSD', 3 );
 
-console.log( `XBTUSD...`)
-console.log( xbt_orderbook );
+```
+
+For the orderbook, can also just make a snapshot on a timer when you choose
+
+```js
+
+setInterval( ()=> {
+
+    // Snapshot all three orderbooks from BitMEX and Bybit and display every 3.0 seconds
+
+    console.log(`\n---- Orderbook Snapshots ----\n`)
+
+    let mex = bitmex.library.snapshot( 'XBTUSD', 3 );
+    console.log( `\nBitMEX XBTUSD`, mex )    
+
+    let ib = ibybit.library.snapshot('BTCUSD', 3 );
+    console.log( `\nBybit Inverse BTCUSD`, ib )
+
+    let lb = bybit.library.snapshot('BTCUSDT', 3 );
+    console.log( `\nBybit Linear BTCUSDT\n`, lb )
+
+    console.log(' ');
+
+}, 3000 );
+
 
 ```
 
 Output ...
 
 ```
+ibybit buy BTCUSD 10000 @ 33831
+bitmex buy XBTUSD 134 @ 33814.5
+bitmex buy XBTUSD 5000 @ 33814.5
+bitmex buy XBTUSD 705 @ 33814.5
+bitmex buy XBTUSD 23 @ 33814.5
+bitmex buy XBTUSD 10 @ 33814.5
+bitmex buy XBTUSD 400 @ 33814.5
+bitmex buy XBTUSD 3728 @ 33814.5
+bitmex buy XBTUSD 10 @ 33815
+bitmex buy XBTUSD 400 @ 33815.5
+ibybit sell BTCUSD 13 @ 33830.5
+ibybit sell BTCUSD 4 @ 33830.5
 
-ETHUSD...
-{ bid: [ [ 1019.4, 467 ], [ 1019, 150 ], [ 1018.95, 50 ] ],
-  ask: [ [ 1019.75, 500 ], [ 1019.8, 12053 ], [ 1019.85, 12050 ] ] }
-XBTUSD...
-{ bid:
-   [ [ 31500.5, 350557 ], [ 31500, 105000 ], [ 31499.5, 110105 ] ],
-  ask: [ [ 31501, 187320 ], [ 31502.5, 100 ], [ 31504.5, 4 ] ] }
+---- Orderbook Snapshots ----
+
+
+BitMEX XBTUSD { bid: [ [ 33816, 597071 ], [ 33815.5, 67000 ], [ 33815, 24100 ] ],
+  ask: [ [ 33816.5, 530 ], [ 33817.5, 400 ], [ 33818.5, 400 ] ] }
+
+Bybit Inverse BTCUSD { bid:
+   [ [ 33830.5, 2386674 ], [ 33830, 136618 ], [ 33829.5, 211 ] ],
+  ask: [ [ 33831, 82102 ], [ 33831.5, 5 ], [ 33832.5, 2042 ] ] }
+
+Bybit Linear BTCUSDT
+ { bid:
+   [ [ 33745, 54.163998 ], [ 33744.5, 27.166 ], [ 33744, 18.719 ] ],
+  ask: [ [ 33745.5, 0.002 ], [ 33747.5, 0.439 ], [ 33749, 0.712 ] ] }
+ 
+ibybit buy BTCUSD 12694 @ 33831
+ibybit buy BTCUSD 250100 @ 33831
+ibybit sell BTCUSD 15 @ 33830.5
+bybit buy BTCUSDT 675 @ 33745.5
+
+
 
 ```
 
