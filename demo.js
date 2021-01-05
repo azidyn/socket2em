@@ -19,6 +19,8 @@ bybit.connect();
 
 setInterval( ()=> {
 
+    // Snapshot all three orderbooks from BitMEX and Bybit and display
+
     let mex = bitmex.library.snapshot( 'XBTUSD', 3 );
     console.log( `\n----- BitMEX XBTUSD -----\n`, mex )    
 
