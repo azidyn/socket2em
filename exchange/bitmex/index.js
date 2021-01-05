@@ -6,8 +6,6 @@ const OrderbookManager  = require('./orderbook/OrderbookManager');;
 const EventEmitter      = require('../../util/EventEmitter');
 const Trade             = require('./trade/Trade');
 
-const { traceDeprecation } = require('process');
-
 const URI       = 'wss://www.bitmex.com/realtime';
 const CAPTURE   =  null; //'./ethusd-l2-stream.json';
 
