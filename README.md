@@ -12,7 +12,7 @@ Initial exchange support will be of the Websocket-only variety.
 
 ### Current state of project
 
-See `test.js` for working example.
+See `demo.js` for working example.
 
 ```js
 
