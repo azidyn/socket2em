@@ -18,7 +18,7 @@ require('./util/debug');
 
 // }, 500 );
 
-const ByBit = require('./exchange/bybit');
+const ByBit = require('./exchange/bybit/inverse');
 
 let bybit = new ByBit();
 

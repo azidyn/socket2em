@@ -145,7 +145,6 @@ class ByBit {
         try {
             topic = json.topic.split('.');
         } catch( e ) {
-            console.log( json );
             console.log(e )
             process.exit();
         }
