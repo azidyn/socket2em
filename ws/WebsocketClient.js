@@ -11,7 +11,9 @@
 const WebSocket = require('isomorphic-ws');
 
 const RECONNECT_DURATION = 5;
-const HEARTBEAT_DURATION = 90;
+const HEARTBEAT_DURATION = 25;
+const LONG_SILENCE = 15;
+
 
 let reconnectTimer = null;
 let heartTimer = null;
@@ -22,28 +24,45 @@ function WebSocketClient( heartbeatDuration, reconnectDuration )
 	this.autoReconnectInterval = 5*1000;	// ms
 	this.reconnectDuration = reconnectDuration || RECONNECT_DURATION;
 	this.heartbeatDuration = heartbeatDuration || HEARTBEAT_DURATION;
-}
 
 
-WebSocketClient.prototype.resetHeartbeat = function()  
-{
-    if ( heartTimer )
-        clearTimeout( heartTimer );
-
-    heartTimer = setTimeout( () => {
-
-        console.log('\n[WSC] connection stale, sending ping...');
-
-        // Ok, we need to test this possible stale connection. See if the server is still contactable...
-        this.instance.send( 'ping' );
-
-        // Set *another* timer to force reconnect the connection if a pong
-        // isnt received in RECONNECT_DURATION seconds
-        reconnectTimer = setTimeout( () => this.reconnect(), this.reconnectDuration * 1000 )
-
-    }, this.heartbeatDuration * 1000 )
+	this.timelastmsg = 0;
 
 }
+
+// WebSocketClient.prototype.heartbeat = function()  {
+
+// 	let n = Date.now();
+
+// 	if ( Date.now() - this.timelastmsg > ( LONG_SILENCE * 1000 )) {
+
+//         this.instance.send( 'ping' );
+
+// 	}
+	
+// }
+
+
+
+// WebSocketClient.prototype.resetHeartbeat = function()  
+// {
+//     if ( heartTimer )
+//         clearTimeout( heartTimer );
+
+//     heartTimer = setTimeout( () => {
+
+//         console.log('\n[WSC] connection stale, sending ping...');
+
+//         // Ok, we need to test this possible stale connection. See if the server is still contactable...
+//         this.instance.send( 'ping' );
+
+//         // Set *another* timer to force reconnect the connection if a pong
+//         // isnt received in RECONNECT_DURATION seconds
+//         reconnectTimer = setTimeout( () => this.reconnect(), this.reconnectDuration * 1000 )
+
+//     }, this.heartbeatDuration * 1000 )
+
+// }
 
 
 WebSocketClient.prototype.open = function(url)
@@ -58,6 +77,8 @@ WebSocketClient.prototype.open = function(url)
 
 		this.onopen();
 
+		// heartTimer = setInterval( this.heartbeat, this.heartbeatDuration * 1000 );
+
 	}
     
     
@@ -65,6 +86,7 @@ WebSocketClient.prototype.open = function(url)
 	this.instance.onmessage = ( packet, flags ) => {
 
 		this.number ++;
+		// this.timelastmsg = Date.now();
 
         // Sent by the BitMEX server in response to our 'ping' message as we detected a possible stale connection
         if ( packet.data == 'pong' )        
@@ -76,8 +98,7 @@ WebSocketClient.prototype.open = function(url)
             return; // abort the function now as 'pong' is not a valid JSON to parse here
         }
 
-        this.resetHeartbeat();
-
+        // this.resetHeartbeat();
 
 		this.onmessage(packet.data,flags,this.number);
 	

@@ -26,7 +26,7 @@
               <td style="padding: 5px; font-weight:bold" colspan="2">BitMEX:ETHUSD</td>
             </tr>
 
-            <tr v-for="row in this.lob.bitmex.eth.bids" :key = "row[0]" style='background-color:#dfd' >
+            <tr v-for="row in this.lob.bitmex.eth.bids" v-bind:key = " row[0] " style='background-color:#dfd' >
               <td>{{ row[0] }}</td>
               <td>{{ row[1] }} </td>
             </tr>
@@ -178,7 +178,8 @@ export default {
 
   methods: {
     dotrades: function( trades ) {
-      
+
+     
       for ( let t of trades ) {
         if ( t.size >= this.minsizetrade ) {
           t.id = this.id++;
