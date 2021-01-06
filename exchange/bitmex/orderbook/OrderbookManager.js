@@ -10,7 +10,6 @@
     
 */
 
-
 const Orderbook = require('./Orderbook');
 
 class OrderbookManager {
@@ -27,7 +26,16 @@ class OrderbookManager {
         if ( !this.library[ instrument ] )
             return undefined;
 
-        return this.library[ instrument ].lob.snapshot( depth );
+        return this.library[ instrument ].snapshot( depth );
+    }
+
+    aggregate( instrument, depth, group ) {
+
+        if ( !this.library[ instrument ] )
+            return undefined;
+
+        return this.library[ instrument ].aggregate( depth, group );
+
     }
 
     handle( msg ) {

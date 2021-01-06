@@ -35,10 +35,10 @@ function show_trades( trades )  {
         console.log(`${t.exchange} ${t.side} ${t.symbol} ${t.size} @ ${t.price}`);
 }
 
-bitmex.on('trades', show_trades )
-bybit.on('trades', show_trades )
-ibybit.on('trades', show_trades )
-ftx.on('trades', show_trades )
+// bitmex.on('trades', show_trades )
+// bybit.on('trades', show_trades )
+// ibybit.on('trades', show_trades )
+// ftx.on('trades', show_trades )
 
 /* 
 
@@ -56,20 +56,27 @@ setInterval( ()=> {
 
     // Snapshot all three orderbooks from BitMEX and Bybit and display
 
-    console.log(`\n---- Orderbook Snapshots ----\n`)
+    // console.log(`\n---- Orderbook Snapshots ----\n`)
 
-    let mex = bitmex.library.snapshot( 'XBTUSD', 3 );
-    console.log( `\nBitMEX XBTUSD`, mex )    
+    let mex = bitmex.library.snapshot( 'XBTUSD', 10 );
+    
+    if ( mex )
+        console.log(  mex )    
 
-    let ib = ibybit.library.snapshot('BTCUSD', 3 );
-    console.log( `\nBybit Inverse BTCUSD`, ib )
+    let agg = bitmex.library.aggregate('XBTUSD', 5, 50 );
 
-    let lb = bybit.library.snapshot('BTCUSDT', 3 );
-    console.log( `\nBybit Linear BTCUSDT\n`, lb )
+    if ( agg )
+        console.log('\n', agg );
 
-    let ft = ftx.library.snapshot('BTC-PERP', 3 );
-    console.log( `\FTX BTC-PERP\n`, ft )
+    // let ib = ibybit.library.snapshot('BTCUSD', 3 );
+    // console.log( `\nBybit Inverse BTCUSD`, ib )
+
+    // let lb = bybit.library.snapshot('BTCUSDT', 3 );
+    // console.log( `\nBybit Linear BTCUSDT\n`, lb )
+
+    // let ft = ftx.library.snapshot('BTC-PERP', 3 );
+    // console.log( `\FTX BTC-PERP\n`, ft )
 
     console.log(' ');
 
-}, 3000 );
+}, 2500 );

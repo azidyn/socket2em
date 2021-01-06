@@ -13,7 +13,19 @@ class Orderbook {
         this.lob = new Book();
 
     }
-    
+
+    aggregate( depth, group ) {
+        
+        return this.lob.aggregate( depth, group, 5 );
+
+    }
+
+    snapshot( depth ) {
+
+        return this.lob.snapshot( depth );
+
+    }
+
     insert( deltas ) {
 
         let delta, price, size;

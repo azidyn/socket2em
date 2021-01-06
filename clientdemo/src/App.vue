@@ -133,23 +133,6 @@
 
       </div>
 
-      <!-- <div class="col">
-
-        <table>
-          <caption>BitMEX:XBTUSD</caption>
-          <tr v-for="row in this.xbt.ask.reverse()" :key = "row[0]" style='background-color:#fdd' >
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }} </td>
-          </tr>
-
-          <tr v-for="row in this.xbt.bid" :key = "row[0]" style='background-color:#dfd' >
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }} </td>
-          </tr>
-        </table>  
-
-      </div> -->
-
     </div>
 
 
@@ -300,10 +283,14 @@ export default {
     setInterval( ()=> {
 
         let eth = this.bitmex.library.snapshot( 'ETHUSD', 10 );
-        let xbt = this.bitmex.library.snapshot( 'XBTUSD', 10 );
-        let bybit_btc = this.bybit.library.snapshot('BTCUSDT', 10 );
+        // let xbt = this.bitmex.library.snapshot( 'XBTUSD', 10 );
+        
+        let xbt = this.bitmex.library.aggregate('XBTUSD', 10, 100 );
+        let bybit_btc = this.bybit.library.snapshot('BTCUSDT', 10, 5 );
+
         let ibybit_btc = this.ibybit.library.snapshot('BTCUSD', 10 );
         let ftx = this.ftx.library.snapshot('ETH-PERP', 10 );
+
 
         if ( eth ) {
 

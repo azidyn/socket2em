@@ -24,6 +24,18 @@ class Orderbook {
         this.lob = new Book();
 
     }
+
+    aggregate( depth, group ) {
+        
+        return this.lob.aggregate( depth, group, 3);
+
+    }
+
+    snapshot( depth ) {
+
+        return this.lob.snapshot( depth );
+
+    }    
  
     update( deltas ) {
 

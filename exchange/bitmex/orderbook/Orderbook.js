@@ -32,6 +32,19 @@ class Orderbook {
         this.id = new Map();
         this.lob = new Book();
 
+
+    }
+
+    aggregate( depth, group ) {
+        
+        return this.lob.aggregate( depth, group );
+
+    }
+
+    snapshot( depth ) {
+
+        return this.lob.snapshot( depth );
+
     }
     
     insert( deltas ) {

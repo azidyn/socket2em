@@ -22,6 +22,7 @@ class Bids {
 
        this.set = this.set_bids;
 
+
     }
 
     peek( price ) {
@@ -117,9 +118,9 @@ class Bids {
             this.head = 0;
             this.ticks = [];
         }
-            
 
     }    
+
 
     // Snapshot of the order book (prices with volume) for a given number of levels
     snapshot( levels ) {

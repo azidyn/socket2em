@@ -1,4 +1,6 @@
 
+const Aggregate = require('../util/aggregate');
+
 const Bids = require('./bids');
 const Asks = require('./asks');
 
@@ -11,6 +13,9 @@ class Book {
 
         this.bids = new Bids( this.useref );
         this.asks = new Asks( this.useref );
+
+        this.agg = new Aggregate();
+
     }
 
     bid( price, size ) {
@@ -32,6 +37,18 @@ class Book {
             bid: this.bids.snapshot( levels ),
             ask: this.asks.snapshot( levels )
         }
+    }
+
+    aggregate( levels, group, dp ) {
+
+        let tick_size = 0.5;
+        const span = levels * ( group / tick_size );
+
+        let bid = this.bids.snapshot( span );
+        let ask = this.asks.snapshot( span );
+
+        return this.agg.group( bid, ask, levels, group, dp );
+
     }
 
 }
